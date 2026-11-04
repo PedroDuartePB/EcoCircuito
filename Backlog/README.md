@@ -1,0 +1,1 @@
+## Biblioteca de recursos e artefatos requisitados pela professora. Serve como o armazenamento das etapas de elicitação de funções requisitos do progeto.
