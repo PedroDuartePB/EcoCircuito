@@ -1,0 +1,55 @@
+@startuml
+!theme plain
+skinparam componentStyle uml2
+
+package "Frontend Application" {
+  [Mobile App (React Native)] as MobileApp
+}
+
+package "API Gateway" {
+  [Gateway / BFF] as Gateway
+}
+
+package "Microservices Ecosystem" {
+  
+  [Search & Map Service] as SearchService
+  [Capacity & Location Service] as CapacityService
+  [Tracking & Registry Service] as RegistryService
+  [Content & Education Service] as ContentService
+  
+  queue "Event Broker (Pub/Sub)" as MessageBroker
+}
+
+database "GeoDB (PostGIS)" as GeoDB
+database "Location DB" as LocationDB
+database "Anonymous Registry DB" as RegistryDB
+
+' Interfaces
+() "Location API" as ILocation
+() "Search API" as ISearch
+() "Registry API" as IRegistry
+() "Content API" as IContent
+
+' Conexões de Gateway
+MobileApp --> Gateway : HTTPS / REST
+Gateway --> ISearch
+Gateway --> ILocation
+Gateway --> IRegistry
+Gateway --> IContent
+
+' Implementações de Interfaces
+ISearch - [SearchService]
+ILocation - [CapacityService]
+IRegistry - [RegistryService]
+IContent - [ContentService]
+
+' Conexões de Banco de Dados (Desacoplamento de dados)
+SearchService --> GeoDB
+CapacityService --> LocationDB
+RegistryService --> RegistryDB
+
+' Comunicação Assíncrona (Desacoplamento no tempo e espaço)
+CapacityService -.> MessageBroker : Publishes "CapacityFull"
+SearchService <.. MessageBroker : Subscribes to Updates
+
+@enduml
