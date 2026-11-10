@@ -78,6 +78,6 @@
 | Privacidade no Registro (Ética) | Como cidadão, eu quero registrar meu descarte preenchendo apenas o tipo e volume de material (sem dados pessoais identificáveis), para contribuir com estatísticas de reciclagem de forma 100% anônima e aderente à LGPD. | | |
 | Imparcial no Mapa | Como cidadão, eu quero visualizar os pontos de coleta filtrados estritamente por proximidade geográfica e capacidade atual, para que a recomendação não favoreça estabelecimentos artificialmente. | | |
 
-## US Funcionais v3 (Refinação Sprint 4)
+## Grau de aplicabilidade das US (Preparação para Sprint 5)
 | NOME | TIPO | STORY POINTS | NÍVEL DE DIFICULDADE |
 | :---: | :---: | :---: | :---: |
