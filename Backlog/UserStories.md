@@ -60,7 +60,7 @@
 > ### Cenário Registro de Descarte
 > Eu passo então pelo cenário de Registro e Confirmação de Descarte. Dado que eu cheguei ao ponto de coleta sugerido com minha sacola de eletrônicos e finalizei o descarte, quando eu acesso o aplicativo para documentar a ação de forma anônima, então o sistema deve registrar a quantidade e o tipo de material que entreguei, processando a entrada rapidamente e me exibindo uma mensagem de confirmação para que eu sinta que concluí meu objetivo de ajudar na gestão sustentável.
 
-## US Funcionais v2 e Não Funcionais (Análises de Cenário BDD + Sprint 3)
+## US Funcionais v2 (Análises de Cenário BDD)
 | NOME | DETALHAMENTO | CRITERIO DE ACEITAÇÃO | FONTE (Cenário) |
 | :---: | :--- | :--- | :---: |
 | Acessibilidade e Desempenho | Como usuário da plataforma, quero acessar uma interface leve, rápida e com recursos de acessibilidade, como alto contraste, para consultar informações e endereços dos pontos de coleta mesmo utilizando dispositivos antigos e conexões instáveis. | A interface deve possuir modo de alto contraste. O sistema deve apresentar layout responsivo e compatível com dispositivos antigos suportados. As informações essenciais devem ser carregadas com otimização para conexões lentas. O endereço do ponto de coleta deve permanecer legível e acessível. | IA (Cenário Acessibilidade) |
@@ -71,8 +71,7 @@
 | Privacidade no Registro de Descarte | Como usuário da plataforma, quero registrar descartes de forma anônima, fornecendo apenas informações essenciais sobre o tipo e o volume dos resíduos, para contribuir com as estatísticas do projeto sem expor meus dados pessoais. | O sistema deve permitir o registro de descarte sem exigir identificação pessoal. O formulário deve solicitar apenas dados necessários, como tipo e volume dos resíduos. O registro não deve exigir nome, CPF, telefone ou endereço do usuário. Os dados coletados devem ser protegidos contra acesso não autorizado. O sistema não deve compartilhar dados pessoais identificáveis com terceiros. | IA (Privacidade de Registros) |
 | Registro e Confirmação de Descarte | Como usuário da plataforma, quero registrar o tipo e a quantidade de resíduos eletrônicos descartados em um ponto de coleta, para documentar minha contribuição e auxiliar no acompanhamento das estatísticas de reciclagem do projeto. | O sistema deve disponibilizar uma funcionalidade para registrar descartes. O usuário deve informar o tipo e a quantidade ou volume dos materiais descartados. O sistema deve processar e armazenar o registro corretamente. Após a conclusão, o sistema deve exibir uma mensagem de confirmação. O registro deve ser realizado sem exigir identificação pessoal do usuário. | IA (Confirmação de Descarte) |
 
-## User Stories Não Funcionais
-
+## User Stories Não Funcionais (Sprint 3)
 | NOME | DETALHAMENTO | CRITERIO DE ACEITAÇÃO | FONTE |
 | :---: | :--- | :--- | :---: |
 | Usabilidade da Plataforma | Eu, como usuário, gostaria que a plataforma apresentasse uma interface simples e intuitiva, para conseguir utilizar suas funcionalidades sem dificuldades, mesmo possuindo pouco conhecimento tecnológico. | As funcionalidades principais devem ser acessíveis sem necessidade de treinamento. Os menus, botões e campos devem possuir identificação clara. Pelo menos 80% dos participantes dos testes devem conseguir utilizar a plataforma com facilidade. | IA |
@@ -96,7 +95,3 @@
 |Gerenciamento de Capacidade (FUNCIONAL) | Como responsável por um ponto de coleta, eu quero atualizar o status de volume de armazenamento do meu estabelecimento no sistema, para que a plataforma direcione novos descartes apenas para locais com capacidade disponível. | | |
 | Privacidade no Registro (Ética) | Como cidadão, eu quero registrar meu descarte preenchendo apenas o tipo e volume de material (sem dados pessoais identificáveis), para contribuir com estatísticas de reciclagem de forma 100% anônima e aderente à LGPD. | | |
 | Imparcial no Mapa | Como cidadão, eu quero visualizar os pontos de coleta filtrados estritamente por proximidade geográfica e capacidade atual, para que a recomendação não favoreça estabelecimentos artificialmente. | | |
-
-## Grau de aplicabilidade das US (Preparação para Sprint 5)
-| NOME | TIPO | STORY POINTS | NÍVEL DE DIFICULDADE |
-| :---: | :---: | :---: | :---: |
