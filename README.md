@@ -31,3 +31,71 @@ Para garantir a eficiência da solução, a plataforma contará com os seguintes
 | José Vinicius | [jose.moura@dcx.ufpb.br](mailto:jose.moura@dcx.ufpb.br) | A definir | adicionar link |
 | Rafael Domingos | [rafael.domingos@dcx.ufpb.br](mailto:rafael.domingos@dcx.ufpb.br) | A definir | adicionar link |
 | Pedro Duarte | [pedro.lima@dcx.ufpb.br](mailto:pedro.lima@dcx.ufpb.br) | A definir | adicionar link |
+
+---
+
+## 🛠️ Setup Técnico e Execução (Fase 0 — Fundação)
+
+A arquitetura implementada segue o padrão de **Monólito Modular Orientado a Eventos (Clean Architecture)** com **FastAPI (Python)**, **PostgreSQL + PostGIS** (uma única instância física com schemas lógicos separados: `location` para Location DB, `geo` para GeoDB, além de `auth`, `registry`, `education` e `shared`), e **React + Vite + TypeScript** em mesma origem lógica via proxy `/api`.
+
+> Consulte os detalhes em [docs/architecture/module-boundaries.md](docs/architecture/module-boundaries.md), [docs/architecture/ADRs.md](docs/architecture/ADRs.md) e [docs/security/phase0-baseline.md](docs/security/phase0-baseline.md).
+
+### Execução com Docker Compose (Windows PowerShell e Linux/macOS)
+
+1. Copie o arquivo de variáveis de ambiente de exemplo:
+   - **Windows (PowerShell):**
+     ```powershell
+     Copy-Item .env.example .env
+     ```
+   - **Linux / macOS:**
+     ```bash
+     cp .env.example .env
+     ```
+2. Suba a stack completa (`db` PostGIS, `migrate` Alembic, `api` FastAPI e `web` React/Vite):
+   ```bash
+   docker compose up --build
+   ```
+3. Verifique os endpoints e a mesma origem:
+   - Frontend (React): `http://localhost:5173/`
+   - Health Live via proxy (mesma origem): `http://localhost:5173/api/v1/health/live`
+   - Health Ready (PostgreSQL + PostGIS + schemas `location` e `geo`): `http://localhost:5173/api/v1/health/ready`
+   - OpenAPI da API (direto): `http://localhost:8000/docs` (habilitado apenas em desenvolvimento)
+
+### Execução Local de Testes e Linters (sem Docker para testes unitários)
+
+- **Backend (Windows PowerShell):**
+  ```powershell
+  cd backend
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  pip install -e ".[dev]"
+  ruff check app tests alembic
+  mypy app
+  pytest -m "not integration"
+  ```
+- **Backend (Linux / macOS):**
+  ```bash
+  cd backend
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -e ".[dev]"
+  ruff check app tests alembic
+  mypy app
+  pytest -m "not integration"
+  ```
+- **Testes de Integração PostGIS (requer banco PostGIS rodando):**
+  ```bash
+  cd backend
+  alembic upgrade head
+  pytest -m integration
+  ```
+- **Frontend (Windows e Linux/macOS):**
+  ```bash
+  cd frontend
+  npm install
+  npm run lint
+  npm run typecheck
+  npm test
+  npm run build
+  ```
+

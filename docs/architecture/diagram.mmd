@@ -1,0 +1,45 @@
+flowchart TB
+    C([Cidadão anônimo])
+    M([Responsável autorizado])
+    UI[React SPA / TypeScript<br/>Mobile-first e acessibilidade]
+    Proxy[HTTPS / reverse proxy<br/>Mesma origem]
+    API[FastAPI API / BFF<br/>REST + validação + CSRF]
+    Auth[Auth<br/>JWT cookie + sessão + RBAC]
+    Cap[Capacity Module RF06<br/>State + ownership]
+    Search[Search Module RF09/RF10<br/>GeoSearchRepository + ranking neutro]
+    Registry[Registry Module RF11/RF12<br/>Descarte anônimo]
+    Edu[Education Module RF03]
+    Broker[Event Broker interno]
+    C --> UI
+    M --> UI
+    UI --> Proxy --> API
+    API --> Auth
+    API --> Cap
+    API --> Search
+    API --> Registry
+    API --> Edu
+
+    subgraph PG[PostgreSQL + PostGIS - unica instancia fisica]
+      direction LR
+      L[(Location DB logico<br/>schema location<br/>pontos + capacidade<br/>geography Point 4326 + GiST)]
+      G[(GeoDB logico<br/>schema geo<br/>views / funcoes espaciais<br/>sem replica de pontos)]
+      A[(schema auth)]
+      R[(schema registry)]
+      E[(schema education)]
+      O[(schema shared<br/>outbox transacional)]
+      G -->|consulta dados oficiais confirmados| L
+    end
+
+    Auth --> A
+    Cap -->|atualizacao ACID| L
+    Search -->|ST_DWithin / ST_Distance| G
+    Registry --> R
+    Edu --> E
+    Cap -->|mesmo commit| O
+    O --> Broker
+    Broker -.->|CapacityFull alerta| Cap
+    Broker -.->|invalidacao opcional de cache| Search
+    Note[GPS do cidadao:<br/>opt-in / POST body / sem persistencia]
+    C -.-> Note
+    Note -.-> Search
+

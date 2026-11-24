@@ -1,0 +1,99 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: ecocircuito-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecocircuito}
+      POSTGRES_USER: ${POSTGRES_MIGRATION_USER:-ecocircuito_migrator}
+      POSTGRES_PASSWORD: ${POSTGRES_MIGRATION_PASSWORD:-dev_only_change_me_migrator}
+      POSTGRES_APP_USER: ${POSTGRES_USER:-ecocircuito_app}
+      POSTGRES_APP_PASSWORD: ${POSTGRES_PASSWORD:-dev_only_change_me_app}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ecocircuito_pgdata:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} && psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -tAc 'SELECT PostGIS_Version();' > /dev/null"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecocircuito-migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_MIGRATION_USER:-ecocircuito_migrator}:${POSTGRES_MIGRATION_PASSWORD:-dev_only_change_me_migrator}@db:5432/${POSTGRES_DB:-ecocircuito}
+      MIGRATION_DATABASE_URL: postgresql+psycopg://${POSTGRES_MIGRATION_USER:-ecocircuito_migrator}:${POSTGRES_MIGRATION_PASSWORD:-dev_only_change_me_migrator}@db:5432/${POSTGRES_DB:-ecocircuito}
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecocircuito-api
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      APP_NAME: ${APP_NAME:-EcoCircuito API}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-ecocircuito_app}:${POSTGRES_PASSWORD:-dev_only_change_me_app}@db:5432/${POSTGRES_DB:-ecocircuito}
+      MIGRATION_DATABASE_URL: postgresql+psycopg://${POSTGRES_MIGRATION_USER:-ecocircuito_migrator}:${POSTGRES_MIGRATION_PASSWORD:-dev_only_change_me_migrator}@db:5432/${POSTGRES_DB:-ecocircuito}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-only-unsafe-secret-change-in-production-min-32-chars}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      JWT_ISSUER: ${JWT_ISSUER:-ecocircuito-api}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-ecocircuito-web}
+      JWT_ACCESS_TTL_SECONDS: ${JWT_ACCESS_TTL_SECONDS:-900}
+      REFRESH_TOKEN_TTL_SECONDS: ${REFRESH_TOKEN_TTL_SECONDS:-604800}
+      CSRF_SECRET_KEY: ${CSRF_SECRET_KEY:-dev-only-unsafe-csrf-secret-change-in-production-32c}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/live', timeout=3)"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 5s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecocircuito-web
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
+      API_PROXY_TARGET: http://api:8000
+    ports:
+      - "127.0.0.1:5173:5173"
+
+volumes:
+  ecocircuito_pgdata:
+
